@@ -1,5 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+SERVER_NODE_NAME = "jereverdS"
+SERVER_NODE_IP = "192.168.56.110"
+
+WORKER_NODE_NAME = "jrinnaSW"
+WORKER_NODE_IP = "192.168.56.111"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -12,34 +17,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "hashicorp/bionic64"
-  config.vm.synced_folder "./", "/shared_folder", create: true
-  config.vm.define "njarosS" do |control|
-    control.vm.hostname = "njarosS"
-    control.vm.network "private_network", ip: "192.168.56.110"
-    control.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--name", "njarosS"]
-      v.customize ["modifyvm", :id, "--cpus", "1"]
-      v.customize ["modifyvm", :id, "--memory", "1024"]
-    end
-    control.vm.provision "shell", inline: <<-SHELL
-      curl "https://get.k3s.io" | sh -s - --flannel-iface eth1
-      cat /var/lib/rancher/k3s/server/node-token > /shared_folder/token
-    SHELL
-  end
-
-  config.vm.define "njarosSW" do |control|
-    control.vm.hostname = "njarosSW"
-    control.vm.network "private_network", ip: "192.168.56.111"
-    control.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--name", "njarosWS"]
-      v.customize ["modifyvm", :id, "--cpus", "1"]
-      v.customize ["modifyvm", :id, "--memory", "1024"]
-    end
-    control.vm.provision "shell", inline: <<-SHELL
-      sudo curl "https://get.k3s.io" | INSTALL_K3S_EXEC="agent --server https://192.168.56.110:6443 --flannel-iface eth1 --token $(cat /shared_folder/token)" sh -
-    SHELL
-  end
+  config.vm.box = "bento/debian-12"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -76,22 +54,19 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
+  config.vm.define SERVER_NODE_NAME do |server|
+    server.vm.hostname = SERVER_NODE_NAME
+    server.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = "1"
+    end
+  end
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
+  config.vm.define WORKER_NODE_NAME do |worker|
+    worker.vm.hostname = WORKER_NODE_NAME
+    worker.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = "1"
+    end
+  end
 end
