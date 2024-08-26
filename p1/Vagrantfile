@@ -1,5 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+SERVER_VM_NAME = "njaros"
+SERVER_NODE_NAME = "jrinnaS"
+SERVER_NODE_IP = "192.168.56.110"
+
+WORKER_VM_NAME = "jrinna"
+WORKER_NODE_NAME = "jrinnaWS"
+WORKER_NODE_IP = "192.168.56.111"
+
+MEM = "1024"
+CPUS = "1"
+
+BOX = "bento/debian-12"
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -7,18 +19,13 @@
 # you're doing.
 Vagrant.configure("2") do |config|
 
-  WORKER_VM_NAME = "jrinna"
-  SERVER_VM_NAME = "njaros"
-
-  WORKER_NODE_NAME = "jrinnaWS"
-  SERVER_NODE_NAME = "jrinnaS"
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "bento/debian-12"
+  config.vm.box = BOX
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -55,35 +62,47 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  config.vm.define WORKER_VM_NAME do |worker|
-    worker.vm.hostname = WORKER_NODE_NAME
-    
-    
-    
-    worker.vm.provider "virtualbox" do |vb|
-      # Display the VirtualBox GUI when booting the machine
-      vb.gui = false
-    
-      # Customize the amount of memory on the VM:
-      vb.memory = "1024"
-      vb.cpus = "1"
-    end
-  end
-
   config.vm.define SERVER_VM_NAME do |server|
     server.vm.hostname = SERVER_NODE_NAME
-    
-    
+    server.vm.network "private_network", ip: SERVER_NODE_IP, bridge: "eth1"
+    server.vm.synced_folder ".", "/vagrant_shared_folder", type: "virtualbox"
+    server.vm.provision "shell", inline: <<-SHELL
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-external-ip=#{SERVER_NODE_IP}" sh -s -
+      cp /var/lib/rancher/k3s/server/node-token /vagrant_shared_folder/.token
+    SHELL
     
     server.vm.provider "virtualbox" do |vb|
       # Display the VirtualBox GUI when booting the machine
       vb.gui = false
   
       # Customize the amount of memory on the VM:
-      vb.memory = "1024"
-      vb.cpus = "1"
+      vb.memory = MEM
+      vb.cpus = CPUS
+      vb.name = SERVER_NODE_NAME
     end
   end
+
+
+
+  config.vm.define WORKER_VM_NAME do |worker|
+    worker.vm.hostname = WORKER_NODE_NAME
+    worker.vm.network "private_network", ip: WORKER_NODE_IP, bridge: "eth1"
+    worker.vm.synced_folder ".", "/vagrant_shared_folder", type: "virtualbox"
+    worker.vm.provision "shell", inline: <<-SHELL
+      curl -sfL https://get.k3s.io | K3S_URL=https://#{SERVER_NODE_IP}:6443 K3S_TOKEN=$(cat /vagrant_shared_folder/.token) sh -s -
+    SHELL
+    
+    worker.vm.provider "virtualbox" do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      vb.gui = false
+    
+      # Customize the amount of memory on the VM:
+      vb.memory = MEM
+      vb.cpus = CPUS
+      vb.name = WORKER_NODE_NAME
+    end
+  end
+
   #
   # View the documentation for the provider you are using for more
   # information on available options.
