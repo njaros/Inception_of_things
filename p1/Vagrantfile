@@ -1,3 +1,8 @@
+require 'fileutils'
+
+# Create vagrant_shared_space directory if it doesn't exist
+FileUtils.mkdir_p 'vagrant_shared_space' unless File.exist?('vagrant_shared_space')
+
 # ---------------------------------------------------------------------------- #
 #                                    Config                                    #
 # ---------------------------------------------------------------------------- #
@@ -26,11 +31,14 @@ Vagrant.configure("2") do |config|
   config.vm.define SERVER_VM_NAME do |server|
     server.vm.hostname = SERVER_NODE_NAME
     server.vm.network "private_network", ip: SERVER_NODE_IP, bridge: "eth1"
-    server.vm.synced_folder ".", "/vagrant_shared_folder", type: "virtualbox"
+    server.vm.synced_folder "vagrant_shared_space", "/vagrant_shared_folder", type: "virtualbox"
     server.vm.provision "shell", inline: <<-SHELL
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-ip=#{SERVER_NODE_IP}" sh -s -
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
       cp /var/lib/rancher/k3s/server/node-token /vagrant_shared_folder/.token
+      cp /etc/rancher/k3s/k3s.yaml /vagrant_shared_folder/k3s.yaml
+      sed -i 's/127.0.0.1/#{SERVER_NODE_IP}/g' /vagrant_shared_folder/k3s.yaml
+      chmod 644 /vagrant_shared_folder/k3s.yaml
     SHELL
     
     server.vm.provider "virtualbox" do |vb|
@@ -49,10 +57,14 @@ Vagrant.configure("2") do |config|
   config.vm.define WORKER_VM_NAME do |worker|
     worker.vm.hostname = WORKER_NODE_NAME
     worker.vm.network "private_network", ip: WORKER_NODE_IP, bridge: "eth1"
-    worker.vm.synced_folder ".", "/vagrant_shared_folder", type: "virtualbox"
-    worker.vm.provision "shell", inline: <<-SHELL
+    worker.vm.synced_folder "vagrant_shared_space", "/vagrant_shared_folder", type: "virtualbox"
+    worker.vm.provision "shell", privileged: false, inline: <<-SHELL
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --node-ip=#{WORKER_NODE_IP}" K3S_URL=https://#{SERVER_NODE_IP}:6443 K3S_TOKEN=$(cat /vagrant_shared_folder/.token) sh -s -
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
+      sudo mkdir -p $HOME/.kube
+      sudo cp /vagrant_shared_folder/k3s.yaml $HOME/.kube/config
+      echo "export KUBECONFIG=$HOME/.kube/config" >> $HOME/.bashrc
+      source $HOME/.bashrc
     SHELL
     
     worker.vm.provider "virtualbox" do |vb|
