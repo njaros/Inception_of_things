@@ -29,6 +29,7 @@ Vagrant.configure("2") do |config|
     server.vm.synced_folder ".", "/vagrant_shared_folder", type: "virtualbox"
     server.vm.provision "shell", inline: <<-SHELL
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-ip=#{SERVER_NODE_IP}" sh -s -
+      echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
       cp /var/lib/rancher/k3s/server/node-token /vagrant_shared_folder/.token
     SHELL
     
@@ -51,6 +52,7 @@ Vagrant.configure("2") do |config|
     worker.vm.synced_folder ".", "/vagrant_shared_folder", type: "virtualbox"
     worker.vm.provision "shell", inline: <<-SHELL
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --node-ip=#{WORKER_NODE_IP}" K3S_URL=https://#{SERVER_NODE_IP}:6443 K3S_TOKEN=$(cat /vagrant_shared_folder/.token) sh -s -
+      echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
     SHELL
     
     worker.vm.provider "virtualbox" do |vb|
