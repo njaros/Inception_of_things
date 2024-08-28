@@ -1,8 +1,3 @@
-require 'fileutils'
-
-# Create vagrant_shared_space directory if it doesn't exist
-FileUtils.mkdir_p 'vagrant_shared_space' unless File.exist?('vagrant_shared_space')
-
 # ---------------------------------------------------------------------------- #
 #                                    Config                                    #
 # ---------------------------------------------------------------------------- #
@@ -26,7 +21,7 @@ Vagrant.configure("2") do |config|
   config.vm.define SERVER_VM_NAME do |server|
     server.vm.hostname = SERVER_NODE_NAME
     server.vm.network "private_network", ip: SERVER_NODE_IP
-    server.vm.synced_folder "vagrant_shared_space", "/vagrant_shared_folder", type: "virtualbox"
+    server.vm.synced_folder "config", "/vagrant_shared_folder", type: "virtualbox"
     server.vm.provider "virtualbox" do |vb|
       # Display the VirtualBox GUI when booting the machine
       vb.gui = false
@@ -40,6 +35,12 @@ Vagrant.configure("2") do |config|
     server.vm.provision "shell", inline: <<-SHELL
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-ip=#{SERVER_NODE_IP}" sh -s -
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
+      kubectl create configmap custom-site-configmap --from-file /vagrant_shared_folder/index.html
+      kubectl apply -f /vagrant_shared_folder/mongo-secret.yaml
+      kubectl apply -f /vagrant_shared_folder/mongo-config.yaml
+      kubectl apply -f /vagrant_shared_folder/custom-site-deployement.yaml
+      kubectl apply -f /vagrant_shared_folder/website-deployement.yaml
+      kubectl apply -f /vagrant_shared_folder/mongo-deployement.yaml
     SHELL
   end
 end
