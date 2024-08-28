@@ -33,11 +33,25 @@ Vagrant.configure("2") do |config|
     end
     
     server.vm.provision "shell", inline: <<-SHELL
+      # installing k3s
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-ip=#{SERVER_NODE_IP}" sh -s -
+      
+      #creating kubectl alias
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
+
+      # creating config map for cutom site volume
       kubectl create configmap custom-site-configmap --from-file /vagrant_shared_folder/index.html
+
+      # applying the differente config and secret
       kubectl apply -f /vagrant_shared_folder/mongo-secret.yaml
       kubectl apply -f /vagrant_shared_folder/mongo-config.yaml
+      kubectl apply -f /vagrant_shared_folder/ingress.yaml
+      # ---------------------------------------------------------------------------- #
+
+      # deploying the 3 app
+      # app1 : custom website
+      # app2 : nashandra website link to app3
+      # app3 : mongodb
       kubectl apply -f /vagrant_shared_folder/custom-site-deployement.yaml
       kubectl apply -f /vagrant_shared_folder/website-deployement.yaml
       kubectl apply -f /vagrant_shared_folder/mongo-deployement.yaml

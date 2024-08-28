@@ -41,11 +41,9 @@ kind: Service
 metadata:
   name: website-service
 spec:
-  type: NodePort
   selector:
     app: website
   ports:
     - protocol: TCP
-      port: 3000 # this is what we want, this is the port to target the service
+      port: 80 # this is what we want, this is the port to target the service
       targetPort: 3000 # this is the port to forward the request to the pod
-      nodePort: 30043 # the extern port on wich k3s will be open
