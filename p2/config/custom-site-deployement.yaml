@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-site-deployment
+  labels: # option but good practice
+    app: custom-site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-site
+  template:
+    metadata:
+      labels:
+        app: custom-site
+    spec:
+      containers:
+      - name: custom-site
+        image: nginx:stable-perl
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html-volume
+        configMap:
+          name: custom-site-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: custom-site-service
+spec:
+  type: NodePort
+  selector:
+    app: custom-site
+  ports:
+    - protocol: TCP
+      port: 80 # this is what we want, this is the port to target the service
+      targetPort: 80 # this is the port to forward the request to the pod
+      nodePort: 30042 # the extern port on wich k3s will be open
