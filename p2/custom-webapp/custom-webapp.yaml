@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-deployment
+  name: custom-webapp-deployment
   labels:
-    app: webapp
+    app: custom-webapp
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: webapp
+      app: custom-webapp
   template:
     metadata:
       labels:
-        app: webapp
+        app: custom-webapp
     spec:
       containers:
-      - name: webapp-deployment
-        image: nginx:stable-perl
+      - name: custom-webapp-deployment
+        image: nginx:latest
         ports:
         - containerPort: 80
         volumeMounts:
@@ -30,11 +30,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-service
+  name: custom-webapp-service
 spec:
   type: NodePort
   selector:
-    app: webapp
+    app: custom-webapp
   ports:
     - protocol: TCP
       port: 80

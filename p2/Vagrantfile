@@ -38,12 +38,15 @@ Vagrant.configure("2") do |config|
     server.vm.provision "shell", inline: 
     <<-SHELL
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-ip=#{SERVER_NODE_IP}" sh -s -
-      kubectl apply -f /vagrant/app1/webapp.yaml
-      kubectl apply -f /vagrant/app2/mongo-config.yaml
-      kubectl apply -f /vagrant/app2/mongo-secret.yaml
-      kubectl apply -f /vagrant/app2/mongo.yaml
-      kubectl apply -f /vagrant/app3/webapp.yaml
-      kubectl create configmap app3.com --from-file /vagrant/app3/index.html
+      kubectl apply -f /vagrant/webapp/webapp.yaml
+      kubectl apply -f /vagrant/webapp/webapp-ingress.yaml
+      kubectl apply -f /vagrant/database-webapp/mongo-config.yaml
+      kubectl apply -f /vagrant/database-webapp/mongo-secret.yaml
+      kubectl apply -f /vagrant/database-webapp/mongo.yaml
+      kubectl apply -f /vagrant/database-webapp/mongo-ingress.yaml
+      kubectl apply -f /vagrant/custom-webapp/custom-webapp.yaml
+      kubectl apply -f /vagrant/custom-webapp/custom-webapp-ingress.yaml
+      kubectl create configmap app3.com --from-file /vagrant/custom-webapp/index.html
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
     SHELL
   end
