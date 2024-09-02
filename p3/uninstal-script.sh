@@ -1,6 +1,5 @@
 #stopping and removing all files linked to Docker
 sudo systemctl stop docker
-sudo rm -rf /etc/apt/sources.list.d/docker.list
 docker system prune -af --volumes
 sudo rm -rf /var/lib/docker
 sudo rm -rf /var/lib/containerd
@@ -10,9 +9,6 @@ sudo rm -rf ~/.docker
 sudo rm -rf /usr/local/bin/docker-compose
 sudo rm -rf /usr/local/bin/docker-machine
 sudo rm -rf /usr/bin/docker
-
-# clean up any leftover dependencies
-sudo apt autoremove
 
 # update the package cache
 sudo apt update
@@ -25,3 +21,6 @@ echo "K3D uninstalled"
 # removing kubectl 
 sudo rm /usr/local/bin/kubectl
 sudo rm -rf ~/.kube
+
+# delete password
+sudo rm /home/jereverd/Documents/Inception_of_things/p3/argocd_password.txt
