@@ -1,6 +1,5 @@
 require 'fileutils'
 
-
 # Create shared_folder directory if it doesn't exist
 FileUtils.mkdir_p 'shared_folder' unless File.exist?('shared_folder')
 

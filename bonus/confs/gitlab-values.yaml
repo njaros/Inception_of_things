@@ -1,0 +1,18 @@
+global:
+  hosts:
+    domain: localhost
+  ingress:
+    configureCertmanager: false
+    class: nginx
+certmanager:
+  install: false
+nginx-ingress:
+  enabled: false
+gitlab-runner:
+  install: true
+postgresql:
+  install: true
+redis:
+  install: true
+minio:
+  install: true
