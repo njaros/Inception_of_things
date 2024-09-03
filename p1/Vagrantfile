@@ -33,12 +33,21 @@ Vagrant.configure("2") do |config|
     server.vm.network "private_network", ip: SERVER_NODE_IP, bridge: "eth1"
     server.vm.synced_folder "vagrant_shared_space", "/vagrant_shared_folder", type: "virtualbox"
     server.vm.provision "shell", inline: <<-SHELL
+      
+      # Install K3S
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644 --node-ip=#{SERVER_NODE_IP}" sh -s -
+      
+      # Making kubectl alias
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
+      
+      # Sharing the master node token so that the worker node can communicate withe the master node
       cp /var/lib/rancher/k3s/server/node-token /vagrant_shared_folder/.token
+
+      # Sharing the k3s config so that the worker kubectl command know on which ip it should try to connect to get info about the node network, this is completly optionnal but it borthered me to not being able to type k get nodes -o wide in the worker
       cp /etc/rancher/k3s/k3s.yaml /vagrant_shared_folder/k3s.yaml
       sed -i 's/127.0.0.1/#{SERVER_NODE_IP}/g' /vagrant_shared_folder/k3s.yaml
       chmod 644 /vagrant_shared_folder/k3s.yaml
+
     SHELL
     
     server.vm.provider "virtualbox" do |vb|
@@ -59,12 +68,20 @@ Vagrant.configure("2") do |config|
     worker.vm.network "private_network", ip: WORKER_NODE_IP, bridge: "eth1"
     worker.vm.synced_folder "vagrant_shared_space", "/vagrant_shared_folder", type: "virtualbox"
     worker.vm.provision "shell", privileged: false, inline: <<-SHELL
+      
+      # Install K3S
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --node-ip=#{WORKER_NODE_IP}" K3S_URL=https://#{SERVER_NODE_IP}:6443 K3S_TOKEN=$(cat /vagrant_shared_folder/.token) sh -s -
+      
+      # Making kubectl alias
       echo "alias 'k'='kubectl'" >> /home/vagrant/.bashrc
+
+      # Create the .kube folder to put the config to be able to connect to the master node with kubectl, this is not nessecary it just bothered me to not being able to do k get nodes -o wide inside the worker node
       sudo mkdir -p $HOME/.kube
       sudo cp /vagrant_shared_folder/k3s.yaml $HOME/.kube/config
+      sudo rm -rf /vagrant_shared_folder/k3s.yaml
       echo "export KUBECONFIG=$HOME/.kube/config" >> $HOME/.bashrc
       source $HOME/.bashrc
+
     SHELL
     
     worker.vm.provider "virtualbox" do |vb|
