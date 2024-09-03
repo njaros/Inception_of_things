@@ -1,12 +1,14 @@
 #!/bin/bash
 
+sudo rm -rf password.txt
+
 # ---------------------------------------------------------------------------- #
 #                              K3D Uninstallation                              #
 # ---------------------------------------------------------------------------- #
 
 # Delete all k3d clusters
 echo "Deleting all k3d clusters..."
-k3d cluster delete --all
+sudo k3d cluster delete --all
 
 # Remove the k3d binary
 echo "Removing k3d binary..."
@@ -14,7 +16,7 @@ sudo rm $(which k3d)
 
 # Remove k3d configuration files
 echo "Removing k3d configuration files..."
-rm -rf ~/.k3d
+sudo rm -rf ~/.k3d
 
 echo "k3d uninstallation and cleanup completed."
 
@@ -25,7 +27,7 @@ echo "k3d uninstallation and cleanup completed."
 # Stop all running containers
 sudo docker stop $(sudo docker ps -aq)
 
-# Remove all containers
+# Remove all containers image volumes etc
 sudo docker system prune -af --volumes
 
 # Uninstall Docker packages
@@ -53,7 +55,7 @@ sudo apt-get clean
 sudo rm /usr/local/bin/kubectl
 
 # remove the config directory
-rm -rf ~/.kube
+sudo rm -rf ~/.kube
 
 # remove alias
 sed -i '/alias kubectl/d' ~/.bashrc

@@ -1,3 +1,4 @@
 .vagrant
 vagrant_shared_space
 p2/Makefile
+password.txt
