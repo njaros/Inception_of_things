@@ -1,8 +1,8 @@
 all:
-	sudo ./install_all.sh
+	sudo ./scripts/install_all.sh
 
 uninstall:
-	sudo ./uninstall_all.sh
+	sudo ./scripts/uninstall_all.sh
 
 re: uninstall all
 
