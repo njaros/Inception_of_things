@@ -18,12 +18,11 @@ sudo mv ./kubectl /usr/local/bin
 sudo kubectl create namespace argocd
 sudo kubectl create namespace dev
 
-# installing 
-# sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-sudo kubectl apply -n argocd -f ./argocd-installation.yaml
+# install argocd configuration ands confs files
+sudo kubectl apply -n argocd -f ./confs/argocd-installation.yaml
+sudo kubectl apply -n argocd -f ./confs/application.yaml
 sleep 5
 sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=60s
-sudo kubectl apply -n argocd -f ./ingress.yaml
+sudo kubectl apply -f ./confs/ingress.yaml
 sleep 5
 sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > argocd_password.txt
-# sudo kubectl port-forward svc/argocd-server -n argocd 8080:443

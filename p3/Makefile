@@ -1,9 +1,9 @@
 all: 
-	./instal-script.sh
+	./scripts/install-script.sh
 
-uninstal: 
-	./uninstal-script.sh
+clean: 
+	./scripts/uninstall-script.sh
 
-re: uninstal all
+re: clean all
 
-.PHONY: all uninstal re
+.PHONY: all clean re
