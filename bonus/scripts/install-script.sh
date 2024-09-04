@@ -7,7 +7,7 @@ sudo sh get-docker.sh
 
 # install K3D
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
-sudo k3d cluster create -p "8080:80" mycluster 
+sudo k3d cluster create -p 8080:80 mycluster 
 
 # Install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -39,11 +39,8 @@ sudo helm repo update
 # Install GitLab using Helm
 sudo helm install gitlab gitlab/gitlab \
   --namespace gitlab \
-  -f ./confs/gitlab-values.yaml \
-  --timeout 600s \
-  --set global.hosts.https=false
+  -f ./confs/gitlab-values.yaml 
+sudo kubectl wait -n gitlab --for=condition=available deployment --all --timeout=-1s
 
 #Get initial root password
 sudo kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode > gitlab_password.txt
-
-sudo kubectl get pods -n gitlab --watch
