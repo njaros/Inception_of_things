@@ -24,7 +24,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /argocd
         pathType: Prefix
         backend:
           service:
@@ -42,7 +42,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /gitlab
+      - path: /
         pathType: Prefix
         backend:
           service:
