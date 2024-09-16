@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo rm -rf password.txt
+sudo rm -rf gitlab_password.txt
 
 # ---------------------------------------------------------------------------- #
 #                                Helm Uninstall                                #
@@ -82,3 +83,15 @@ sudo rm -rf ~/.kube
 # remove alias
 sed -i '/alias kubectl/d' ~/.bashrc
 source ~/.bashrc
+
+# ---------------------------------------------------------------------------- #
+#                               Testing Uninstall                              #
+# ---------------------------------------------------------------------------- #
+
+echo "---------Testing uninstall---------"
+sudo kubectl get all --all-namespaces
+sudo kubectl version
+sudo k3d --version
+sudo docker --version
+sudo helm version
+echo "everything is uninstall"
