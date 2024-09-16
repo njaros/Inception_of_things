@@ -1,0 +1,11 @@
+thing that i've done for it to work: run make
+do port forwarding to connect to gitlab
+connect to gitlab
+go into the setting, general tab, import and export setting, and allow import from https url plus the little option below (the box to check)
+return on the main gitlab page
+got to the project page and click on import from project
+enter the github wil repo url, click on the group and mouve the mousse for the group rrot to appear and select it,
+put the repo in public
+now the repo should synchronize, it can take some time but it should result in having the exact same repo as the one on github
+now go to argocd and modify the wil app to change the repourl to sync to this one : http://gitlab-webservice-default.gitlab.svc.cluster.local:8181/root/jrinna_Iot_p3.git/
+this should save without complainning about the url, if the url is a bad url or argocd can't acces the repo the change will not be saved and a warnning should pop
