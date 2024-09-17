@@ -38,7 +38,7 @@ echo "----------Adding ArgoCD To The K3D Cluster----------"
 sudo kubectl apply -n argocd -f ./confs/argocd.yaml # we used this because we've modify the installation script a bit on line 10270 ish
 echo "----------Waitting For Pods"
 sleep 10
-sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=120s
+sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=180s
 echo "----------Port Forwarding-----------"
 sudo kubectl apply -f ./confs/ingress.yaml
 sudo kubectl apply -n argocd -f ./confs/application.yaml
@@ -63,7 +63,7 @@ sudo helm install gitlab gitlab/gitlab \
   --set certmanager.install=false \
   --set gitlab-runner.install=false
 sleep 10
-sudo kubectl wait -n gitlab --for=condition=Ready pods --all --timeout=180s
+sudo kubectl wait -n gitlab --for=condition=Ready pods --all --timeout=300s
 sudo kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 -d > gitlab_password.txt
 
 # Testing
