@@ -10238,6 +10238,10 @@ spec:
       - command:
         - argocd-server
         - --insecure # FOR HTTPS REDIRECTION
+        - --rootpath # FOR /argocd INGRESS PATH
+        - /argocd
+        - --basehref
+        - /argocd
         env:
         - name: ARGOCD_SERVER_INSECURE
           valueFrom:

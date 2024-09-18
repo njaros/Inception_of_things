@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/a-boring-man/jrinna_Iot_p3.git
+    repoURL: http://gitlab-webservice-default.gitlab.svc.cluster.local:8181/root/jrinna_Iot_p3.git/
     targetRevision: HEAD
     path: .
   destination:
