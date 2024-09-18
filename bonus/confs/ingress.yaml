@@ -28,7 +28,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /argocd
         pathType: Prefix
         backend:
           service:
@@ -49,10 +49,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: /gitlab
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: gitlab-webservice-default
             port:
-              number: 8080
+              number: 8181

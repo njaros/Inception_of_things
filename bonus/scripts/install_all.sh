@@ -56,13 +56,12 @@ sudo helm install gitlab gitlab/gitlab \
   --set global.ingress.configureCertmanager=false \
   --set global.hosts.https=false \
   --set global.ingress.enabled=true \
-  --set gitlab.webservice.service.type=ClusterIP \
-  --set gitlab.webservice.service.externalPort=8080 \
-  --set nginx-ingress.enable=false \
   --set minio.enable=false \
   --set certmanager.install=false \
   --set gitlab-runner.install=false
+  # --set nginx-ingress.enable=false \
 sleep 10
+
 sudo kubectl wait -n gitlab --for=condition=Ready pods --all --timeout=300s
 sudo kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 -d > gitlab_password.txt
 
