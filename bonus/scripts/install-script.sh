@@ -27,10 +27,10 @@ sleep 5
 sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=60s
 sudo kubectl apply -f ./confs/ingress.yaml
 sleep 5
+sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > argocd_password.txt
 
 # install Helm
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > argocd_password.txt
 
 # Add the GitLab Helm repository
 sudo helm repo add gitlab https://charts.gitlab.io/
