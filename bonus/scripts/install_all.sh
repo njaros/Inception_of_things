@@ -42,7 +42,7 @@ sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=180s
 echo "----------Configuring ArgoCD-----------"
 sudo kubectl apply -f ./confs/ingress.yaml
 sudo kubectl apply -n argocd -f ./confs/application.yaml
-sudo kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d > argoCD_password.txt
+sudo kubectl get secret argocd-initial-admin-secret -n argocd -o yaml | grep password | awk '{print $2}' | base64 -d > argoCD_password.txt
 echo "----------ArgoCD Should Be Configured-----------"
 
 # Installing Helm
