@@ -1,0 +1,6 @@
+- Connect to localhost:8080/ with user=root pwd=gitlab_pwd
+
+- Go into the setting, general tab, import and export setting, and allow import from repository url
+
+- Go to the project page and import a github repository that have a k3d deployment resource and put the repo to public
+- This is the url to now provide to argocd for it to sync with this repo: http://gitlab-webservice-default.gitlab.svc.cluster.local:8181/root/jrinna_Iot_p3.git/
