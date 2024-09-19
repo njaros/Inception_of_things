@@ -36,11 +36,12 @@ echo "----------Adding ArgoCD To The K3D Cluster----------"
 sudo kubectl apply -n argocd -f ./confs/argocd.yaml # we used this because we've modify the installation script a bit on line 10270 ish
 echo "----------Waitting For Pods"
 sleep 10
-sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=120s
-echo "----------Port Forwarding-----------"
+sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=180s
+echo "----------Configuring ArgoCD-----------"
 sudo kubectl apply -f ./confs/ingress.yaml
 sudo kubectl apply -n argocd -f ./confs/application.yaml
-sudo kubectl get secret argocd-initial-admin-secret -n argocd -o yaml | grep password | awk '{print $2}' | base64 -d > password.txt
+sudo kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d > argoCD_password.txt
+echo "----------ArgoCD Should Be Configured-----------"
 
 
 # Testing
@@ -49,3 +50,4 @@ sudo docker --version
 sudo k3d --version
 sudo kubectl version
 sudo kubectl get all --all-namespaces
+sudo k9s
