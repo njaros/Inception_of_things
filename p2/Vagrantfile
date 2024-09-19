@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define SERVER_VM_NAME do |server|
     server.vm.hostname = SERVER_NODE_NAME
-    server.vm.network "private_network", ip: SERVER_NODE_IP
+    server.vm.network "private_network", ip: SERVER_NODE_IP, bridge: "eth1"
     server.vm.synced_folder "confs", "/vagrant_shared_folder", type: "virtualbox"
     server.vm.provider "virtualbox" do |vb|
       # Display the VirtualBox GUI when booting the machine
