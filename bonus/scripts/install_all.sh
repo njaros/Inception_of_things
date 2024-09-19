@@ -35,19 +35,22 @@ sudo kubectl create namespace gitlab
 
 # Install ArgoCD in k3d cluster
 echo "----------Adding ArgoCD To The K3D Cluster----------"
-sudo kubectl apply -n argocd -f ./confs/argocd.yaml # we used this because we've modify the installation script a bit on line 10270 ish
+sudo kubectl apply -n argocd -f ./confs/argocd.yaml # we used this because we've modify the installation script a bit on line 10242 ish
 echo "----------Waitting For Pods"
 sleep 10
 sudo kubectl wait -n argocd --for=condition=Ready pods --all --timeout=180s
-echo "----------Port Forwarding-----------"
+echo "----------Configuring ArgoCD-----------"
 sudo kubectl apply -f ./confs/ingress.yaml
 sudo kubectl apply -n argocd -f ./confs/application.yaml
-sudo kubectl get secret argocd-initial-admin-secret -n argocd -o yaml | grep password | awk '{print $2}' | base64 -d > password.txt
+sudo kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d > argoCD_password.txt
+echo "----------ArgoCD Should Be Configured-----------"
 
 # Installing Helm
+echo "----------Installing Helm-----------"
 sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # Installing GitLab
+echo "----------Installing Gitlab With Helm-----------"
 sudo helm repo add gitlab https://charts.gitlab.io # telling helm were to look
 sudo helm repo update # telling helm to get the latest info about it's repository (the new one we just addded)
 sudo helm install gitlab gitlab/gitlab \
@@ -58,12 +61,13 @@ sudo helm install gitlab gitlab/gitlab \
   --set global.ingress.enabled=true \
   --set minio.enable=false \
   --set certmanager.install=false \
-  --set gitlab-runner.install=false
-  # --set nginx-ingress.enable=false \
-sleep 10
+  --set gitlab-runner.install=false \
 
+echo "----------Waitting For Gitlab Pod To Be Ready-----------"
+sleep 10
 sudo kubectl wait -n gitlab --for=condition=Ready pods --all --timeout=300s
 sudo kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 -d > gitlab_password.txt
+echo "----------Gitlab Should Be Ready-----------"
 
 # Testing
 echo "---------Testing install---------"
@@ -72,3 +76,4 @@ sudo kubectl version
 sudo k3d --version
 sudo docker --version
 sudo helm version
+sudo k9s
