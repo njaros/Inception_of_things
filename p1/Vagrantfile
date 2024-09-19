@@ -6,8 +6,8 @@ FileUtils.mkdir_p 'vagrant_shared_space' unless File.exist?('vagrant_shared_spac
 # ---------------------------------------------------------------------------- #
 #                                    Config                                    #
 # ---------------------------------------------------------------------------- #
-SERVER_VM_NAME = "njaros"
-SERVER_NODE_NAME = "jrinnaS"
+SERVER_VM_NAME = "jereverd"
+SERVER_NODE_NAME = "jereverdS"
 SERVER_NODE_IP = "192.168.56.110"
 
 WORKER_VM_NAME = "jrinna"

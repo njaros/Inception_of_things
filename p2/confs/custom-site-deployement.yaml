@@ -32,9 +32,11 @@ kind: Service
 metadata:
   name: custom-site-service
 spec:
+  # type: NodePort
   selector:
     app: custom-site
   ports:
     - protocol: TCP
       port: 80 # this is what we want, this is the port to target the service
       targetPort: 80 # this is the port to forward the request to the pod
+      # nodePort: 30042
